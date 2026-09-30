@@ -1,0 +1,29 @@
+# ai-generated: 100% - Claude Code (Opus 5.5) wrote this file from design/LAB4.md section 4.1; the lecturer reviews it
+# P1 pages (the pager), P2 and P3 go to chat; while checkout pages, the shop's P2 warnings are muted.
+global:
+  resolve_timeout: 5m
+route:
+  receiver: chat
+  group_by: [alertname, service]
+  group_wait: 10s
+  group_interval: 1m
+  repeat_interval: 4h
+  routes:
+    - matchers: ['severity="P1"']
+      receiver: pager
+    - matchers: ['severity=~"P2|P3"']
+      receiver: chat
+receivers:
+  - name: pager
+    webhook_configs:
+      - url: http://pager:8080/hook/pager
+        send_resolved: true
+  - name: chat
+    webhook_configs:
+      - url: http://pager:8080/hook/chat
+        send_resolved: true
+inhibit_rules:
+  - name: checkout-down-mutes-shop-warnings
+    source_matchers: ['alertname=~"ShopCheckoutErrors|ShopCheckoutSlow"']
+    target_matchers: ['severity="P2"']
+    equal: [system]

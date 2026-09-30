@@ -1,0 +1,7 @@
+# ai-generated: 100% - Claude Code (Fable 5.1) wrote this file from design/LAB1.md sections 4.1 and 7.4; the lecturer reviewed it
+lab: 5
+baselines: {}
+repository: swasik/itsm-2026-lab5-pilot
+login: swasik                               # the Lab 5 pilot: the canary set is chosen for the repository owner
+submissions_repo: swasik/itsm-2026-submissions
+checker_image: ghcr.io/swasik/itsmlab:2026   # the course tag (LAB1.md 10.4); only the grader pins a digest

@@ -1,0 +1,21 @@
+# ai-generated: 100% - Claude Code (Opus 5.5) wrote this file from design/LAB4.md section 4.1; the lecturer reviews it
+routes:
+  - labels: {alertname: ShopCheckoutErrors, service: checkout, system: shop, severity: P1}
+    receivers: [pager]
+  - labels: {alertname: ShopCheckoutSlow, service: checkout, system: shop, severity: P1}
+    receivers: [pager]
+  - labels: {alertname: ShopServiceErrors, service: shop, system: shop, severity: P2}
+    receivers: [chat]
+  - labels: {alertname: KbSearchLatencyBurnFast, service: svcdesk, slo: latency, severity: P1}
+    receivers: [pager]
+  - labels: {alertname: KbSearchLatencyBurnSlow, service: svcdesk, slo: latency, severity: P2}
+    receivers: [chat]
+inhibitions:
+  # while checkout pages, the shop's own P2 warnings are noise
+  - source: {alertname: ShopCheckoutErrors, service: checkout, system: shop, severity: P1}
+    target: {alertname: ShopServiceSlow, service: shop, system: shop, severity: P2}
+    inhibited: true
+  # but not svcdesk's: a different system (the `equal: [system]` label differs)
+  - source: {alertname: ShopCheckoutErrors, service: checkout, system: shop, severity: P1}
+    target: {alertname: ShopServiceSlow, service: shop, system: svcdesk, severity: P2}
+    inhibited: false

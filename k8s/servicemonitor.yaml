@@ -1,0 +1,15 @@
+# ai-generated: 100% - Claude Code (Opus 5.5) wrote this file; the lecturer reviews it
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: svcdesk
+  labels:
+    release: kube-prometheus-stack
+spec:
+  selector:
+    matchLabels:
+      app: svcdesk
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 5s

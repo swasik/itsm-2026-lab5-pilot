@@ -1,0 +1,50 @@
+{
+  "investigator": {
+    "agent": "the course's agent loop (student-package/lab4/agent/agent.py), 8 steps at most",
+    "model": "qwen3:1.7b on Ollama 0.34.4, thinking off",
+    "mcp_server": "the course's prom_mcp.py (mcp 2.2.0) against the playground's Prometheus",
+    "transcript": "ai-rca/transcript.md"
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "hypothesis": "The **Checkout** service has a high error rate (6 errors)",
+      "component": "checkout",
+      "predicts": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\", span_kind=\"SPAN_KIND_SERVER\", status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\", span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.05",
+      "at": "2026-09-27T00:49:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "18.6 % of checkout's server spans failed over the 5 minutes to 00:49; none on the baseline, 00:40:35. The 6 is right too: the PlaceOrder error counter stood at 6 at 00:50."
+    },
+    {
+      "id": "H2",
+      "hypothesis": "The **Product Catalog** service is experiencing increasing load and response times, which could indicate potential performance issues or increased usage.",
+      "component": "product-catalog",
+      "predicts": "(sum(rate(traces_span_metrics_calls_total{service_name=\"product-catalog\", span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 1.2 * sum(rate(traces_span_metrics_calls_total{service_name=\"product-catalog\", span_kind=\"SPAN_KIND_SERVER\"}[5m] offset 10m))) or (histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"product-catalog\", span_kind=\"SPAN_KIND_SERVER\"}[5m]))) > 1.5 * histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"product-catalog\", span_kind=\"SPAN_KIND_SERVER\"}[5m] offset 10m))))",
+      "at": "2026-09-27T00:49:00Z",
+      "result": false,
+      "verdict": "hallucinated",
+      "evidence": "Load fell, 1.89 calls/s at 00:49 against 2.16 at 00:39, and the p99 went from 7.8 ms to 8.2 ms, inside its normal noise. The agent read the counters' cumulative values as durations (step 6)."
+    },
+    {
+      "id": "H3",
+      "hypothesis": "The **Order Preparation** service is also under load, with increasing call counts and response times.",
+      "component": "checkout",
+      "predicts": "(sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\", span_name=\"prepareOrderItemsAndShippingQuoteFromCart\"}[5m])) > 1.2 * sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\", span_name=\"prepareOrderItemsAndShippingQuoteFromCart\"}[5m] offset 10m))) and (histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\", span_name=\"prepareOrderItemsAndShippingQuoteFromCart\"}[5m]))) > 1.2 * histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\", span_name=\"prepareOrderItemsAndShippingQuoteFromCart\"}[5m] offset 10m))))",
+      "at": "2026-09-27T00:49:00Z",
+      "result": false,
+      "verdict": "hallucinated",
+      "evidence": "There is no Order Preparation service: prepareOrderItemsAndShippingQuoteFromCart is a span inside checkout. Its calls did rise (0.125/s against 0.075/s, the load generator's mix) but its p99 fell from 47.6 ms to 38.0 ms, so the claim as made - more calls and slower - is false."
+    },
+    {
+      "id": "H4",
+      "hypothesis": "which may suggest backend issues or configuration problems",
+      "component": null,
+      "predicts": null,
+      "at": null,
+      "result": null,
+      "verdict": "unfalsifiable",
+      "why_no_query": "It names no service, no mechanism and no time: every failure of any backend is a backend issue, so no result of any query could show it to be wrong."
+    }
+  ]
+}

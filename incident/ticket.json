@@ -1,0 +1,23 @@
+{
+  "id": "be17ddf2-2d48-49e2-ac37-e1e26f8f1ac2",
+  "title": "Shop checkout failing - paged by ShopCheckoutErrors",
+  "description": "Opened by the on-call when the pager fired (Lab 4 pilot).",
+  "reporter": {
+    "name": "on-call",
+    "email": null,
+    "vip": false
+  },
+  "impact": 1,
+  "urgency": 1,
+  "priority": "P1",
+  "state": "resolved",
+  "created_at": "2026-09-27T00:48:46Z",
+  "acknowledged_at": "2026-09-27T00:49:26Z",
+  "resolved_at": "2026-09-27T00:56:30Z",
+  "closed_at": null,
+  "related_to": null,
+  "sla": {
+    "ack_due_at": "2026-09-27T01:03:46Z",
+    "resolve_due_at": "2026-09-27T04:48:46Z"
+  }
+}

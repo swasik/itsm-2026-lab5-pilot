@@ -1,0 +1,21 @@
+# ai-generated: 100% - Claude Code (Opus 5.5) wrote this file from design/LAB3.md M-31; the lecturer reviews it
+# kube-prometheus-stack 89.2.2 on kind, capped for a 16 GB laptop (agenda section 6, Lab 3 k8s track)
+prometheus:
+  prometheusSpec:
+    retention: 2h
+    resources:
+      requests:
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+alertmanager:
+  alertmanagerSpec:
+    resources:
+      limits:
+        memory: 128Mi
+grafana:
+  resources:
+    limits:
+      memory: 512Mi
