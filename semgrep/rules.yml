@@ -1,0 +1,22 @@
+# ai-generated: 100% - Claude Code (Opus 5.5) wrote these rules for the course reference (CI-SPEC.md P-31); the lecturer reviews it
+rules:
+  # svcdesk builds some SQL text at run time (the column list, the WHERE clauses) and binds every value; this rule
+  # lists every such statement so that a review can check each one binds its values - the review Semgrep's generic
+  # raw-query rule forces on every execute() (TRIAGE.md), narrowed to the statements that need it.
+  - id: svcdesk-sql-text-built-at-run-time
+    languages: [python]
+    severity: INFO
+    message: SQL text assembled at run time; every value in it must be a bound parameter, never formatted in
+    patterns:
+      - pattern: $CONN.execute(f"...", $PARAMS)
+  # Lab 1's SLA clock can be driven by a test header (SVCDESK_TEST_CLOCK); a wall-clock read anywhere but the clock
+  # module bypasses it and makes the SLA tests lie. The rule reports every wall-clock read; src/svcdesk/clock.py holds
+  # the one that is meant to exist.
+  - id: svcdesk-wall-clock-read
+    languages: [python]
+    severity: WARNING
+    message: wall-clock read; outside svcdesk/clock.py use clock.now() so that the test clock applies
+    pattern-either:
+      - pattern: datetime.now(...)
+      - pattern: datetime.utcnow()
+      - pattern: time.time()
